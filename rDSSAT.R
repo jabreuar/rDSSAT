@@ -65,3 +65,20 @@ configuration <- function(config="") {
   result <- content(response, "text")
   return(result)
 }
+
+runSimulation <- function(crop="", experiments) {
+  experimentsJson <- toJSON(experiments)
+  url <- paste(baseUrl, "runSimulation/", crop, "/", experimentsJson, sep = "")
+  URLEncoded = URLencode(url, reserved = FALSE, repeated = FALSE)
+  response <- GET(URLEncoded)
+  result <- content(response, "text")
+  return(result)
+}
+
+getOutputResult <- function(crop="", file="") {
+  url <- paste(baseUrl, "out/", crop, "/", file, sep = "")
+  response <- GET(url)
+  result <- content(response, "text")
+  return(result)
+}
+

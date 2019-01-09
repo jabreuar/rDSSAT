@@ -6,13 +6,12 @@ opentool <- openExternalTool("XBuild/XBuild.exe")
 experimentsResponse <- experiments("Barley")
 outfilesResponse <- getOutputFiles("Barley")
 
-document <- fromJSON(txt=experimentsResponse)
+experimentsResponseObj <- fromJSON(txt=experimentsResponse)
 document1 <- fromJSON(txt=outfilesResponse)
 
 treatmentsSelected <- c("IEBR8201.BAX")
 treatmentsResponse <- treatments("Barley", treatmentsSelected)
-
-document2 <- fromJSON(txt=treatmentsResponse)
+treatmentsResponseObj <- fromJSON(txt=treatmentsResponse)
 
 configurationResponse <- configuration("path")
 document3 <- toJSON(configurationResponse)
@@ -22,3 +21,9 @@ document4 <- toJSON(configurationResponse)
 
 configurationResponse <- configuration("version")
 document5 <- toJSON(configurationResponse)
+
+
+simulation <- runSimulation("Barley", treatmentsResponseObj[1,])
+
+outputResult = getOutputResult("Barley", "PlantGro.OUT")
+outputResultObj <- fromJSON(txt=outputResult, pretty = TRUE)
