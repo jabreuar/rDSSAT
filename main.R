@@ -25,5 +25,5 @@ document5 <- toJSON(configurationResponse)
 
 simulation <- runSimulation("Barley", treatmentsResponseObj[1,])
 
-outputResult = getOutputResult("Barley", "PlantGro.OUT")
-outputResultObj <- fromJSON(txt=outputResult, pretty = TRUE)
+outputResult = outputResult("/DSSAT47/Barley/PlantGro.OUT")
+

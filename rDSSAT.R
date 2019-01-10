@@ -82,3 +82,44 @@ getOutputResult <- function(crop="", file="") {
   return(result)
 }
 
+outputResult <- function(filep="") {
+  if(!file.exists(filep)) {
+    print("Forcing return from read_file...") 
+    return(NULL)
+  }
+  print(paste0("Loading file: ",filep))
+  suppressMessages({fOUT = readLines(filep)})
+  nottrashLines = grep(pattern = '[^ ]', fOUT)[!(grep(pattern = '[^ ]', fOUT) %in% 
+                                                   c(grep(pattern = '^\\$', fOUT), 
+                                                     grep(pattern = '^\\*', fOUT),
+                                                     grep(pattern = '.+:', fOUT),
+                                                     grep(pattern = '^\\!', fOUT)))]
+  treatmentsLines<-grep(pattern = '.+TREATMENT', fOUT)
+  treatments<-sapply(treatmentsLines,function(v){scan(text = fOUT[v], what = "")[2]})
+  fOUT_clean = fOUT[nottrashLines]
+  print(head(fOUT_clean, n=7))
+  trtHeaders=which(grepl(pattern = '^@', fOUT_clean))
+  print(class(trtHeaders))
+  if(length(trtHeaders)<=0) {
+    print("Forcing return from read_file... No Headers") 
+    return(NULL)
+  }
+  varN = lapply(trtHeaders, function(i) {
+    make.names(scan(text = gsub(pattern = '^@', 
+                                replacement = '',fOUT_clean[i]),
+                    what = character()))
+  })
+  pos <- c(trtHeaders,length(fOUT_clean)+1)
+  tmpA = lapply(seq(1,length(pos)-1), function(w) {
+    res<-read.table(text = fOUT_clean[seq(from=pos[w], length.out = pos[w+1]-pos[w])],
+                    skip = 1, 
+                    col.names = varN[[w]],
+                    na.strings = c('-99', '-99.0', '-99.'))
+    res$TRT <- treatments[w]
+    res
+  })
+  data <- do.call("rbind",tmpA)
+  data <- data[c('TRT',varN[[1]])]
+  print(head(data))
+  return(data)
+}
